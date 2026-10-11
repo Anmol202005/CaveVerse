@@ -91,7 +91,7 @@ export default function RoomSetup({
                     username.trim(),
                     character,
                 );
-            bootstrap.launchGame();
+            await bootstrap.launchGame();
         } catch (err) {
             store.dispatch(setIsLoading(false));
             const message = err instanceof Error ? err.message : "";

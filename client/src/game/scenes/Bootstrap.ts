@@ -1,4 +1,4 @@
-import { setRoomJoined } from "../../app/features/room/roomSlice";
+import { setIsLoading, setRoomJoined } from "../../app/features/room/roomSlice";
 import store from "../../app/store";
 import Network from "./Network";
 
@@ -85,8 +85,16 @@ export class Bootstrap extends Phaser.Scene {
         this.network = new Network();
     }
 
-    launchGame() {
+    async launchGame() {
+        // Lobby connections can finish before the map and textures are ready.
+        store.dispatch(setIsLoading(true));
+        if (this.load.isLoading()) {
+            await new Promise<void>((resolve) => {
+                this.load.once(Phaser.Loader.Events.COMPLETE, () => resolve());
+            });
+        }
         this.scene.launch("GameScene", { network: this.network });
         store.dispatch(setRoomJoined(true));
+        store.dispatch(setIsLoading(false));
     }
 }
