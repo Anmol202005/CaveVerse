@@ -24,7 +24,6 @@ export default function RoomSelection() {
                         <Mountain size={23} strokeWidth={2.4} />
                     </span>
                     Cave<span>Verse</span>
-                    <span className="brand-beta">BETA</span>
                 </button>
                 <nav aria-label="Main navigation">
                     <a href="#how-it-works" onClick={() => setView("home")}>

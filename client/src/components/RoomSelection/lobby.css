@@ -72,17 +72,6 @@
     color: #8e4434;
     transform: rotate(-4deg);
 }
-.brand .brand-beta {
-    font-size: 9px;
-    letter-spacing: 1.3px;
-    font-weight: 600;
-    padding: 4px 6px;
-    border: 1px solid #d9ddd4;
-    border-radius: 4px;
-    margin-left: 11px;
-    align-self: center;
-    color: #728075;
-}
 .lobby-header nav {
     display: flex;
     align-items: center;
@@ -1113,9 +1102,6 @@
     .brand {
         font-size: 21px;
     }
-    .brand-beta {
-        display: none;
-    }
     .landing-hero {
         grid-template-columns: 1fr;
         padding: 43px 24px 34px;
@@ -1230,9 +1216,6 @@
         width: 33px;
         height: 33px;
         border-radius: 9px;
-    }
-    .brand .brand-beta {
-        display: none;
     }
     .lobby-header nav > a {
         display: none;
