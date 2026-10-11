@@ -15,7 +15,7 @@ function App() {
     const roomJoined = useAppSelector((state) => state.room.roomJoined);
     const showOfficeChat = useAppSelector((state) => state.chat.showOfficeChat);
     const [screenDialogOpen, setScreenDialogOpen] = useState(false);
-    const [showChat, setShowChat] = useState(() => window.innerWidth > 600);
+    const [showChat, setShowChat] = useState(false);
 
     return (
         <>

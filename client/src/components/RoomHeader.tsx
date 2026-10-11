@@ -22,15 +22,6 @@ export default function RoomHeader({
                     {isInsideOffice ? "Office space" : "The common space"}
                 </span>
             </div>
-            <div className="room-walk-hint">
-                <span>Make yourself at home</span>
-                <span>
-                    <kbd>↑</kbd>
-                    <kbd>←</kbd>
-                    <kbd>↓</kbd>
-                    <kbd>→</kbd> to move
-                </span>
-            </div>
         </header>
     );
 }
