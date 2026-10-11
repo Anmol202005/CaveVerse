@@ -13,6 +13,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get("/health", (_req, res) => {
+    res.json({ status: "ok" });
+});
+
 const server = http.createServer(app);
 const gameServer = new Server({
     server,
@@ -32,7 +36,9 @@ gameServer.define("PRIVATE_ROOM", MyRoom).enableRealtimeListing();
 // app.use("/", socialRoutes);
 
 // register colyseus monitor AFTER registering your room handlers
-app.use("/colyseus", monitor());
+if (process.env.NODE_ENV !== "production") {
+    app.use("/colyseus", monitor());
+}
 
 gameServer.listen(port);
 console.log(`Listening on ws://localhost:${port}`);

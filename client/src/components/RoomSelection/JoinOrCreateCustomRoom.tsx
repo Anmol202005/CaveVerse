@@ -1,171 +1,128 @@
-import { useState } from "react";
-import { Button } from "../ui/button";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "../ui/card";
+    ArrowLeft,
+    ArrowRight,
+    DoorOpen,
+    LockKeyhole,
+    Plus,
+    Users,
+} from "lucide-react";
 import { useAppSelector } from "../../app/hooks";
-import CreateCustomRoom from "./CreateCustomRoom";
-import { ArrowLeft, LockIcon } from "lucide-react";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "../ui/table";
-import JoinCustomRoom from "./JoinCustomRoom";
 
-const JoinOrCreateCustomRoom = ({
-    setCarouselApi,
-    getSelectedCharacter,
-    setShowPublicRoom,
-    setShowCreateOrJoinCustomRoom,
-}: {
-    setCarouselApi: () => void;
-    getSelectedCharacter: () => "nancy" | "ash" | "lucy" | "adam";
-    setShowPublicRoom: React.Dispatch<React.SetStateAction<boolean>>;
-    setShowCreateOrJoinCustomRoom: React.Dispatch<
-        React.SetStateAction<boolean>
-    >;
-}) => {
-    const availableRooms = useAppSelector((state) => state.room.availableRooms);
-    const [showCreateRoom, setShowCreateRoom] = useState(false);
-    const [showJoinRoom, setShowJoinRoom] = useState(false);
-    const [roomId, setRoomId] = useState("");
-    const [roomName, setRoomName] = useState("");
-    const [roomHasPassword, setRoomHasPassword] = useState(false);
-
-    if (showJoinRoom) {
-        return (
-            <JoinCustomRoom
-                roomName={roomName}
-                roomId={roomId}
-                roomHasPassword={roomHasPassword}
-                getSelectedCharacter={getSelectedCharacter}
-                setCarouselApi={setCarouselApi}
-                setShowCreateOrJoinCustomRoom={setShowCreateOrJoinCustomRoom}
-                setShowJoinRoom={setShowJoinRoom}
-            />
-        );
-    }
-
-    if (showCreateRoom) {
-        return (
-            <CreateCustomRoom
-                getSelectedCharacter={getSelectedCharacter}
-                setCarouselApi={setCarouselApi}
-                setShowCreateOrJoinCustomRoom={setShowCreateOrJoinCustomRoom}
-                setShowCreateRoom={setShowCreateRoom}
-            />
-        );
-    }
-
-    return (
-        <Card className="w-full max-w-2xl">
-            <CardHeader>
-                <CardTitle className="text-2xl relative text-center">
-                    <ArrowLeft
-                        className="cursor-pointer text-zinc-500 absolute left-0"
-                        onClick={() => {
-                            setShowCreateOrJoinCustomRoom(false);
-                            setShowPublicRoom(false);
-                        }}
-                    />
-                    All the available custom rooms
-                </CardTitle>
-                <CardDescription className="text-center">
-                    Custom rooms can be passwordless too!
-                    <br />
-                    Rooms with password will have a lock icon next to it.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4 w-full">
-                {availableRooms.length > 0 ? (
-                    <div className="w-full">
-                        {/* TODO: Find a way to make table body scrollable */}
-                        <div className="max-h-[60vh] overflow-y-auto">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="font-semibold">
-                                            Room Name
-                                        </TableHead>
-                                        <TableHead className="font-semibold">
-                                            Room Id
-                                        </TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {availableRooms.map((room, index) => (
-                                        <TableRow
-                                            key={room.roomId}
-                                            className={`w-full h-fit ${
-                                                index % 2
-                                                    ? "bg-zinc-100"
-                                                    : "bg-white"
-                                            }`}
-                                        >
-                                            <TableCell>
-                                                {room.roomName}
-                                            </TableCell>
-                                            <TableCell>{room.roomId}</TableCell>
-                                            <TableCell className="flex items-center justify-end">
-                                                <Button
-                                                    className="cursor-pointer"
-                                                    onClick={() => {
-                                                        setRoomId(room.roomId);
-                                                        setRoomName(
-                                                            room.roomName
-                                                        );
-                                                        setRoomHasPassword(
-                                                            room.hasPassword
-                                                        );
-                                                        setShowJoinRoom(true);
-                                                    }}
-                                                >
-                                                    {room.hasPassword && (
-                                                        <LockIcon />
-                                                    )}
-                                                    Join
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </div>
-                        <Button
-                            variant="secondary"
-                            className="cursor-pointer mt-5 w-full"
-                            onClick={() => setShowCreateRoom(true)}
-                        >
-                            Create Custom Room
-                        </Button>
-                    </div>
-                ) : (
-                    <div className="flex items-center justify-center flex-col gap-3">
-                        <h1 className="text-center font-semibold">
-                            Oops! No custom rooms are available,
-                            <br /> click below button to create your own custom
-                            room 👇🏻
-                        </h1>
-                        <Button
-                            variant="secondary"
-                            className="cursor-pointer"
-                            onClick={() => setShowCreateRoom(true)}
-                        >
-                            Create Custom Room
-                        </Button>
-                    </div>
-                )}
-            </CardContent>
-        </Card>
-    );
+export type CustomRoom = {
+    roomName: string;
+    roomId: string;
+    hasPassword: boolean;
 };
 
-export default JoinOrCreateCustomRoom;
+export default function JoinOrCreateCustomRoom({
+    onBack,
+    onCreate,
+    onJoin,
+}: {
+    onBack: () => void;
+    onCreate: () => void;
+    onJoin: (room: CustomRoom) => void;
+}) {
+    const rooms = useAppSelector((state) => state.room.availableRooms);
+    const loading = useAppSelector((state) => state.room.isLoading);
+    return (
+        <section className="room-browser">
+            <button className="back-link" onClick={onBack}>
+                <ArrowLeft size={16} /> Back to home
+            </button>
+            <div className="browser-heading">
+                <div>
+                    <div className="eyebrow">FIND YOUR LITTLE CORNER</div>
+                    <h1>Good company starts here.</h1>
+                    <p>
+                        Join a friend’s space, or make a little world of your
+                        own.
+                    </p>
+                </div>
+                <button className="cave-button primary" onClick={onCreate}>
+                    <Plus size={18} /> Create a room
+                </button>
+            </div>
+            <div className="browser-toolbar">
+                <span>
+                    <Users size={17} /> Custom rooms{" "}
+                    <span className="room-count">{rooms.length}</span>
+                </span>
+                <span>
+                    <span
+                        className={`status-dot ${loading ? "connecting" : ""}`}
+                    />
+                    {loading ? "Connecting…" : "Updated live"}
+                </span>
+            </div>
+            {rooms.length ? (
+                <div className="room-grid">
+                    {rooms.map((room, index) => (
+                        <article className="browse-room" key={room.roomId}>
+                            <div
+                                className={`room-art ${["mint", "peach", "lavender"][index % 3]}`}
+                            >
+                                <DoorOpen size={50} strokeWidth={1.2} />
+                                <span>
+                                    {room.hasPassword ? (
+                                        <LockKeyhole size={16} />
+                                    ) : (
+                                        <Users size={16} />
+                                    )}
+                                    {room.hasPassword
+                                        ? "Password protected"
+                                        : "Open room"}
+                                </span>
+                            </div>
+                            <div className="browse-room-body">
+                                <h2>{room.roomName}</h2>
+                                <p>
+                                    Room ID <code>{room.roomId}</code>
+                                </p>
+                                <button
+                                    className="cave-button secondary"
+                                    onClick={() => onJoin(room)}
+                                >
+                                    Join this room <ArrowRight size={17} />
+                                </button>
+                            </div>
+                        </article>
+                    ))}
+                </div>
+            ) : (
+                <div className="rooms-empty">
+                    <div className="empty-room-art">
+                        <DoorOpen size={62} strokeWidth={1.1} />
+                        <span className="empty-star">✦</span>
+                        <span className="empty-star small">✧</span>
+                    </div>
+                    <span className="eyebrow">A FRESH START</span>
+                    <h2>
+                        {loading
+                            ? "Finding your people…"
+                            : "The next great hangout could be yours."}
+                    </h2>
+                    <p>
+                        {loading
+                            ? "We’re connecting to the server to discover available rooms."
+                            : "No custom rooms are open yet. Create the first one, invite your crew, and make yourself at home."}
+                    </p>
+                    <button className="cave-button primary" onClick={onCreate}>
+                        <Plus size={18} /> Create the first room
+                    </button>
+                    <small>
+                        With or without a password. Always your space.
+                    </small>
+                </div>
+            )}
+            <div className="browser-tip">
+                <LockKeyhole size={18} />
+                <p>
+                    <strong>A little privacy, if you like.</strong> A lock means
+                    the host has added a password. Ask them for it before
+                    joining.
+                </p>
+            </div>
+        </section>
+    );
+}

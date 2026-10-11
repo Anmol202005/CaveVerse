@@ -45,7 +45,7 @@ function App() {
                     />
                 </>
             )}
-            <CornerActionButtons isInGame={roomJoined} />
+            {roomJoined && <CornerActionButtons isInGame={roomJoined} />}
         </>
     );
 }

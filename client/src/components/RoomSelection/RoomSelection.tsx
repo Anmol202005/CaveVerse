@@ -1,58 +1,88 @@
 import { useState } from "react";
+import { ArrowUpRight, Mountain } from "lucide-react";
 import RoomDecider from "./RoomDecider";
-import PublicRoom from "./PublicRoom";
-import JoinOrCreateCustomRoom from "./JoinOrCreateCustomRoom";
-import { CarouselApi } from "../ui/carousel";
+import JoinOrCreateCustomRoom, {
+    type CustomRoom,
+} from "./JoinOrCreateCustomRoom";
+import RoomSetup from "./RoomSetup";
+import "./lobby.css";
 
-const RoomSelection = () => {
-    const [showPublicRoom, setShowPublicRoom] = useState(false);
-    const [showCreateOrJoinCustomRoom, setShowCreateOrJoinCustomRoom] =
-        useState(false);
-    const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+type View = "home" | "public" | "rooms" | "create" | "join";
 
-    const getSelectedCharacter = () => {
-        switch (carouselApi.selectedScrollSnap()) {
-            case 0:
-                return "nancy";
-            case 1:
-                return "ash";
-            case 2:
-                return "lucy";
-            case 3:
-                return "adam";
-        }
-    };
-
+export default function RoomSelection() {
+    const [view, setView] = useState<View>("home");
+    const [room, setRoom] = useState<CustomRoom>();
     return (
-        <div className="w-screen h-screen bg-zinc-50 absolute left-0 top-0 flex flex-col gap-2 items-center justify-center">
-            {showPublicRoom ? (
-                <PublicRoom
-                    setCarouselApi={setCarouselApi as () => void}
-                    getSelectedCharacter={getSelectedCharacter}
-                    setShowCreateOrJoinCustomRoom={
-                        setShowCreateOrJoinCustomRoom
-                    }
-                    setShowPublicRoom={setShowPublicRoom}
-                />
-            ) : showCreateOrJoinCustomRoom ? (
-                <JoinOrCreateCustomRoom
-                    setCarouselApi={setCarouselApi as () => void}
-                    getSelectedCharacter={getSelectedCharacter}
-                    setShowCreateOrJoinCustomRoom={
-                        setShowCreateOrJoinCustomRoom
-                    }
-                    setShowPublicRoom={setShowPublicRoom}
-                />
-            ) : (
-                <RoomDecider
-                    setShowCreateOrJoinCustomRoom={
-                        setShowCreateOrJoinCustomRoom
-                    }
-                    setShowPublicRoom={setShowPublicRoom}
-                />
-            )}
+        <div className="cave-lobby">
+            <header className="lobby-header">
+                <button
+                    className="brand"
+                    onClick={() => setView("home")}
+                    aria-label="CaveVerse home"
+                >
+                    <span className="brand-mark">
+                        <Mountain size={23} strokeWidth={2.4} />
+                    </span>
+                    Cave<span>Verse</span>
+                    <span className="brand-beta">BETA</span>
+                </button>
+                <nav aria-label="Main navigation">
+                    <a href="#how-it-works" onClick={() => setView("home")}>
+                        How it works
+                    </a>
+                    <a
+                        href="https://github.com/Zopsss/CaveVerse"
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        GitHub <ArrowUpRight size={14} />
+                    </a>
+                    <button
+                        className="nav-cta"
+                        onClick={() => setView("create")}
+                    >
+                        Create a room <ArrowUpRight size={15} />
+                    </button>
+                </nav>
+            </header>
+            <main>
+                {view === "home" && (
+                    <RoomDecider
+                        onPublic={() => setView("public")}
+                        onBrowse={() => setView("rooms")}
+                        onCreate={() => setView("create")}
+                    />
+                )}
+                {view === "rooms" && (
+                    <JoinOrCreateCustomRoom
+                        onBack={() => setView("home")}
+                        onCreate={() => setView("create")}
+                        onJoin={(selected) => {
+                            setRoom(selected);
+                            setView("join");
+                        }}
+                    />
+                )}
+                {(view === "public" ||
+                    view === "create" ||
+                    view === "join") && (
+                    <RoomSetup
+                        key={view + (room?.roomId ?? "")}
+                        mode={view}
+                        room={room}
+                        onBack={() =>
+                            setView(view === "join" ? "rooms" : "home")
+                        }
+                    />
+                )}
+            </main>
+            <footer className="lobby-footer">
+                <span>A small world, made for real connection.</span>
+                <span>
+                    Made with a little pixel magic{" "}
+                    <span aria-hidden="true">✦</span>
+                </span>
+            </footer>
         </div>
     );
-};
-
-export default RoomSelection;
+}
