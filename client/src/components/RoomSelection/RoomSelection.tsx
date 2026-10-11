@@ -30,13 +30,16 @@ export default function RoomSelection() {
                     <a href="#how-it-works" onClick={() => setView("home")}>
                         How it works
                     </a>
-                    <a
-                        href="https://github.com/Zopsss/CaveVerse"
-                        target="_blank"
-                        rel="noreferrer"
-                    >
-                        GitHub <ArrowUpRight size={14} />
-                    </a>
+                    {view === "home" && (
+                        <a
+                            className="github-link"
+                            href="https://github.com/Anmol202005/caveverse"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            GitHub <ArrowUpRight size={14} />
+                        </a>
+                    )}
                     <button
                         className="nav-cta"
                         onClick={() => setView("create")}

@@ -1422,6 +1422,19 @@
         font-size: 11px;
     }
 }
+@media (max-width: 800px) {
+    .lobby-header nav a.github-link {
+        display: inline-flex;
+    }
+}
+@media (max-width: 600px) {
+    .lobby-header nav {
+        gap: 9px;
+    }
+    .lobby-header nav a.github-link {
+        font-size: 10px;
+    }
+}
 @media (prefers-reduced-motion: reduce) {
     .cave-lobby {
         scroll-behavior: auto;

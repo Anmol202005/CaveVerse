@@ -3,8 +3,6 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "../components/ui/tooltip";
-import GitHubLogo from "../components/icons/GitHubLogo";
-import XLogo from "../components/icons/XLogo";
 import { Check, InfoIcon } from "lucide-react";
 import {
     Popover,
@@ -49,50 +47,6 @@ const CornerActionButtons = ({ isInGame }: { isInGame: boolean }) => {
                     </PopoverContent>
                 </Tooltip>
             </Popover>
-
-            {/* GitHub */}
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <a
-                        href="https://www.github.com/Zopsss/CaveVerse"
-                        target="_blank"
-                        className={buttonCss}
-                    >
-                        <GitHubLogo
-                            fill={`${isInGame ? "#000000" : "#ffffff"}`}
-                        />
-                    </a>
-                </TooltipTrigger>
-                <TooltipContent
-                    className={!isInGame ? "bg-primary" : "text-primary"}
-                    customTooltipArrow={
-                        !isInGame ? "bg-primary fill-primary" : undefined
-                    }
-                >
-                    Github repository
-                </TooltipContent>
-            </Tooltip>
-
-            {/* X */}
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <a
-                        href="https://www.x.com/zopssukiii"
-                        target="_blank"
-                        className={buttonCss}
-                    >
-                        <XLogo fill={`${isInGame ? "#000000" : "#ffffff"}`} />
-                    </a>
-                </TooltipTrigger>
-                <TooltipContent
-                    className={!isInGame ? "bg-primary" : "text-primary"}
-                    customTooltipArrow={
-                        !isInGame ? "bg-primary fill-primary" : undefined
-                    }
-                >
-                    X / Twitter
-                </TooltipContent>
-            </Tooltip>
         </div>
     );
 };
