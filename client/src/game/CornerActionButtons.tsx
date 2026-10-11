@@ -1,111 +1,97 @@
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from "../components/ui/tooltip";
-import { Check, InfoIcon } from "lucide-react";
+    ArrowUpRight,
+    Globe2,
+    Info,
+    Keyboard,
+    LockKeyhole,
+    MessageCircle,
+    MonitorUp,
+} from "lucide-react";
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "../components/ui/popover";
 
-const CornerActionButtons = ({ isInGame }: { isInGame: boolean }) => {
-    const isInGameCss = "bg-white text-white-foreground hover:bg-white/90";
-    const isInLobbyCss =
-        "bg-primary text-primary-foreground hover:bg-primary/90";
-    const buttonCss = `shadow-xs p-2 rounded-full cursor-pointer ${
-        isInGame ? isInGameCss : isInLobbyCss
-    }`;
-
+export default function CornerActionButtons() {
     return (
-        <div
-            className={`absolute bottom-7 flex items-center gap-3 ${
-                isInGame ? "left-12" : "right-12"
-            }`}
-        >
-            {/* Info */}
+        <div className="room-guide-trigger">
             <Popover>
-                <Tooltip>
-                    <PopoverTrigger>
-                        <TooltipTrigger asChild>
-                            <div className={buttonCss}>
-                                <InfoIcon />
-                            </div>
-                        </TooltipTrigger>
-                    </PopoverTrigger>
-                    <TooltipContent
-                        className={!isInGame ? "bg-primary" : "text-primary"}
-                        customTooltipArrow={
-                            !isInGame ? "bg-primary fill-primary" : undefined
-                        }
+                <PopoverTrigger asChild>
+                    <button
+                        className="room-help-button"
+                        aria-label="Open room guide"
                     >
-                        Project information
-                    </TooltipContent>
-                    <PopoverContent className="z-[100] w-fit ml-5 mb-3">
-                        <ProjectInformation />
-                    </PopoverContent>
-                </Tooltip>
+                        <Info size={18} />
+                        <span>Room guide</span>
+                    </button>
+                </PopoverTrigger>
+                <PopoverContent
+                    className="room-guide"
+                    side="top"
+                    align="start"
+                    sideOffset={12}
+                >
+                    <span className="room-eyebrow">MAKE YOURSELF AT HOME</span>
+                    <h2>A little guide to your world.</h2>
+                    <p>Good company is just a few steps away.</p>
+                    <ul>
+                        <li>
+                            <span>
+                                <Keyboard size={19} />
+                            </span>
+                            <div>
+                                <strong>Take a little wander</strong>
+                                <p>
+                                    Use the arrow keys to move. Click the map
+                                    after chatting to get back to exploring.
+                                </p>
+                            </div>
+                        </li>
+                        <li>
+                            <span>
+                                <MessageCircle size={19} />
+                            </span>
+                            <div>
+                                <strong>Closer feels more connected</strong>
+                                <p>
+                                    Walk near someone to connect with proximity
+                                    voice and video.
+                                </p>
+                            </div>
+                        </li>
+                        <li>
+                            <span>
+                                <MonitorUp size={19} />
+                            </span>
+                            <div>
+                                <strong>Make something together</strong>
+                                <p>
+                                    Inside offices, connect with everyone, chat
+                                    privately, and share your screen.
+                                </p>
+                            </div>
+                        </li>
+                        <li>
+                            <span>
+                                <LockKeyhole size={19} />
+                            </span>
+                            <div>
+                                <strong>Your own little corner</strong>
+                                <p>
+                                    Custom rooms can be open or protected with a
+                                    password.
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                    <div className="guide-footer">
+                        <Globe2 size={14} /> A small world, made for real
+                        connection.
+                        <ArrowUpRight size={14} />
+                    </div>
+                </PopoverContent>
             </Popover>
         </div>
     );
-};
-
-const ProjectInformation = () => (
-    <>
-        <h2 className="text-xl font-bold mb-4">Project Information</h2>
-        <ul className="space-y-3 flex items-start flex-col">
-            <li className="flex items-start justify-center gap-2">
-                <Check size={22} />
-                <div>
-                    <h3 className="font-xl font-bold mb-1">
-                        Public/Custom Rooms
-                    </h3>
-                    <p className="text-sm">
-                        Join public rooms or create private ones, with or
-                        without a password.
-                    </p>
-                </div>
-            </li>
-            <li className="flex items-start justify-center gap-2">
-                <Check size={22} />
-                <div>
-                    <h3 className="font-xl font-bold mb-1">
-                        Character Controlling
-                    </h3>
-                    <p className="text-sm">
-                        Move your character using the arrow keys.
-                    </p>
-                </div>
-            </li>
-            <li className="flex items-start justify-center gap-2">
-                <Check size={22} />
-                <div>
-                    <h3 className="font-xl font-bold mb-1">Proximity Chat</h3>
-                    <p className="text-sm">
-                        When outside offices, you can video call nearby players
-                        via proximity chat. This gets disabled upon entering any
-                        office.
-                    </p>
-                </div>
-            </li>
-            <li className="flex items-start justify-center gap-2">
-                <Check size={22} />
-                <div>
-                    <h3 className="font-xl font-bold mb-1">Offices</h3>
-                    <p className="text-sm">
-                        Private spaces on the map where:
-                        <ul className="list-disc space-y-1.5 pl-5">
-                            <li>All members can video call each other</li>
-                            <li>Each office has its own private chat</li>
-                            <li>Screen sharing is supported</li>
-                            <li>Proximity chat is disabled</li>
-                        </ul>
-                    </p>
-                </div>
-            </li>
-        </ul>
-    </>
-);
-
-export default CornerActionButtons;
+}

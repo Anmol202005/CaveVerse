@@ -214,11 +214,11 @@ export class GameScene extends Phaser.Scene {
     }
 
     async startWebcam(shouldConnectToOtherPlayers = false) {
-        this.myPlayer.startWebcam(shouldConnectToOtherPlayers);
+        await this.myPlayer.startWebcam(shouldConnectToOtherPlayers);
     }
 
     async startScreenSharing() {
-        this.myPlayer.startScreenSharing();
+        await this.myPlayer.startScreenSharing();
     }
 
     async create(data: { network: Network }) {

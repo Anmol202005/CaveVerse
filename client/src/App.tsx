@@ -7,12 +7,15 @@ import FloatingActions from "./components/FloatingActions";
 import { AnimatePresence } from "framer-motion";
 import VideoCall from "./components/VideoCall";
 import CornerActionButtons from "./game/CornerActionButtons";
+import RoomHeader from "./components/RoomHeader";
+import { Toaster } from "sonner";
+import "./components/room.css";
 
 function App() {
     const roomJoined = useAppSelector((state) => state.room.roomJoined);
     const showOfficeChat = useAppSelector((state) => state.chat.showOfficeChat);
     const [screenDialogOpen, setScreenDialogOpen] = useState(false);
-    const [showChat, setShowChat] = useState(true);
+    const [showChat, setShowChat] = useState(() => window.innerWidth > 600);
 
     return (
         <>
@@ -22,7 +25,8 @@ function App() {
                 </>
             )}
             {roomJoined && (
-                <>
+                <div className={`room-ui ${showChat ? "chat-is-open" : ""}`}>
+                    <RoomHeader isInsideOffice={showOfficeChat} />
                     {showChat && <Chat setShowChat={setShowChat} />}
                     <VideoCall />
                     <AnimatePresence mode="wait">
@@ -34,7 +38,13 @@ function App() {
                             setShowChat={setShowChat}
                         />
                     </AnimatePresence>
-                </>
+                    <CornerActionButtons />
+                    <Toaster
+                        position="top-center"
+                        closeButton
+                        toastOptions={{ className: "room-toast" }}
+                    />
+                </div>
             )}
 
             {showOfficeChat && (
@@ -45,7 +55,6 @@ function App() {
                     />
                 </>
             )}
-            {roomJoined && <CornerActionButtons isInGame={roomJoined} />}
         </>
     );
 }

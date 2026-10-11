@@ -1,39 +1,44 @@
+import { CameraOff, MicOff } from "lucide-react";
 import { useAppSelector } from "../app/hooks";
 import { VideoPlayer } from "./VideoPlayer";
 
-const VideoCall = () => {
-    const myWebcamStream = useAppSelector(
-        (state) => state.webcam.myWebcamStream
+export default function VideoCall() {
+    const stream = useAppSelector((state) => state.webcam.myWebcamStream);
+    const peers = useAppSelector((state) => state.webcam.peerStreams);
+    const disconnected = useAppSelector(
+        (state) => state.webcam.isDisconnectedFromVideoCalls,
     );
-    const peerStreams = useAppSelector((state) => state.webcam.peerStreams);
-    const isDisconnectedFromVideoCalls = useAppSelector(
-        (state) => state.webcam.isDisconnectedFromVideoCalls
-    );
-
-    // if user is disconnected from video calls then do not show any webcams
-    if (isDisconnectedFromVideoCalls) return;
-
+    const camera = useAppSelector((state) => state.webcam.isWebcamOn);
+    const mic = useAppSelector((state) => state.webcam.isMicOn);
+    if (disconnected || (!stream && !peers.size)) return null;
     return (
-        <div className="absolute left-[35px] top-[10px] max-h-screen flex flex-col flex-wrap gap-2">
-            {myWebcamStream && (
-                <VideoPlayer
-                    stream={myWebcamStream}
-                    className="w-48 border-2"
-                    // muting own video
-                    muted
-                />
+        <section className="room-videos" aria-label="Video calls">
+            {stream && (
+                <div className="room-video">
+                    <VideoPlayer stream={stream} muted />
+                    {!camera && (
+                        <div className="video-camera-off">
+                            <CameraOff size={23} />
+                            <span>Camera is off</span>
+                        </div>
+                    )}
+                    <div className="video-caption">
+                        <span>
+                            You <small>Your little corner</small>
+                        </span>
+                        {!mic && <MicOff size={14} />}
+                    </div>
+                </div>
             )}
-            {Array.from(peerStreams.entries()).map(([key, value]) => {
-                return (
-                    <VideoPlayer
-                        stream={value.stream}
-                        className="w-48 border-2"
-                        key={key}
-                    />
-                );
-            })}
-        </div>
+            {Array.from(peers.entries()).map(([key, value]) => (
+                <div className="room-video" key={key}>
+                    <VideoPlayer stream={value.stream} />
+                    <div className="video-caption">
+                        <span>Nearby guest</span>
+                        <span className="room-status-dot" />
+                    </div>
+                </div>
+            ))}
+        </section>
     );
-};
-
-export default VideoCall;
+}

@@ -1,177 +1,178 @@
-import { ScreenShareIcon, ScreenShareOff } from "lucide-react";
-import { Button } from "./ui/button";
+import { useEffect, useState } from "react";
+import {
+    Expand,
+    LoaderCircle,
+    MonitorUp,
+    ScreenShare as ShareIcon,
+    ScreenShareOff,
+} from "lucide-react";
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
 } from "./ui/dialog";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import phaserGame from "../game/main";
-import { GameScene } from "../game/scenes/GameScene";
-import { useEffect, useState } from "react";
-import { Toaster } from "sonner";
 import { toast } from "sonner";
 import { useAppSelector } from "../app/hooks";
 import { VideoPlayer } from "./VideoPlayer";
 import FullScreenPlayer from "./FullScreenPlayer";
+import phaserGame from "../game/main";
+import { GameScene } from "../game/scenes/GameScene";
 import store from "../app/store";
 import { stopScreenSharing } from "../app/features/webRtc/screenSlice";
 
-const ScreenShare = ({
+export default function ScreenShare({
     screenDialogOpen,
     setScreenDialogOpen,
 }: {
     screenDialogOpen: boolean;
     setScreenDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
-    const peerStreams = useAppSelector((state) => state.screen.peerStreams);
+}) {
+    const peers = useAppSelector((state) => state.screen.peerStreams);
     const myStream = useAppSelector((state) => state.screen.myScreenStream);
-    const [isFullScreen, setIsFullScreen] = useState(false);
-    const [streamToDisplay, setStreamToDisplay] = useState<MediaStream>();
-    const [username, setUsername] = useState("");
-    const [key, setKey] = useState("");
-
-    const startScreenSharing = async () => {
-        const gameInstance = phaserGame.scene.keys.GameScene as GameScene;
-        await gameInstance.startScreenSharing();
-        setScreenDialogOpen(false);
-        toast(<div className="font-semibold">Started Screen Sharing</div>);
-    };
-
-    const handleStopScreenSharing = () => {
-        store.dispatch(stopScreenSharing());
-        toast(<div className="font-semibold">Stopped Screen Sharing</div>);
-    };
-
-    const handleFullScreenVideo = (
-        stream: MediaStream,
-        username: string,
-        key: string
-    ) => {
-        setIsFullScreen(true);
-        setStreamToDisplay(stream);
-        setUsername(username);
-        setKey(key);
-    };
-
-    // checking if the current full screened video player left the room
-    // if he did then close that full screened video.
+    const [expanded, setExpanded] = useState<{
+        stream: MediaStream;
+        username: string;
+        key: string;
+    }>();
+    const [starting, setStarting] = useState(false);
     useEffect(() => {
-        if (isFullScreen) {
-            if (!peerStreams.has(key)) {
-                setIsFullScreen(false);
-            }
+        if (expanded && !peers.has(expanded.key)) setExpanded(undefined);
+    }, [peers, expanded]);
+    const startSharing = async () => {
+        setStarting(true);
+        try {
+            await (
+                phaserGame.scene.keys.GameScene as GameScene
+            ).startScreenSharing();
+            setScreenDialogOpen(false);
+            toast.success("Your screen is now shared with this office.");
+        } catch {
+            toast(
+                "Screen sharing wasn’t started. You can try again whenever you’re ready.",
+            );
+        } finally {
+            setStarting(false);
         }
-    }, [peerStreams]);
-
-    if (isFullScreen) {
-        return (
-            <FullScreenPlayer
-                username={username}
-                stream={streamToDisplay}
-                setIsFullScreen={setIsFullScreen}
-            />
-        );
-    }
-
+    };
     return (
         <>
             <Dialog open={screenDialogOpen} onOpenChange={setScreenDialogOpen}>
-                <DialogContent className="h-[50%] flex flex-col justify-between">
-                    <DialogHeader className="mt-3">
-                        <DialogTitle className="text-center">
-                            Shared Screens
+                <DialogContent
+                    className="room-dialog screen-dialog"
+                    onOpenAutoFocus={() =>
+                        (
+                            phaserGame.scene.keys.GameScene as GameScene
+                        ).disableKeys()
+                    }
+                    onCloseAutoFocus={() =>
+                        (
+                            phaserGame.scene.keys.GameScene as GameScene
+                        ).enableKeys()
+                    }
+                >
+                    <DialogHeader>
+                        <span className="dialog-illustration">
+                            <MonitorUp size={26} />
+                        </span>
+                        <span className="room-eyebrow">
+                            A LITTLE SPACE TO CREATE
+                        </span>
+                        <DialogTitle>
+                            Better ideas, shared together.
                         </DialogTitle>
+                        <DialogDescription>
+                            Share your screen with the people in your current
+                            office.
+                        </DialogDescription>
                     </DialogHeader>
-                    <div
-                        className={`grid ${
-                            peerStreams.size > 0 || myStream
-                                ? "grid-cols-2 auto-rows-max"
-                                : "text-center place-items-center"
-                        } h-full overflow-auto gap-2 mt-2 py-2`}
-                    >
-                        {peerStreams.size > 0 || myStream ? (
-                            <>
-                                {myStream && (
-                                    <Card>
-                                        <CardHeader>
-                                            <CardTitle className="truncate">
-                                                Your Screen
-                                            </CardTitle>
-                                        </CardHeader>
-                                        <CardContent className="px-3">
-                                            <VideoPlayer stream={myStream} />
-                                        </CardContent>
-                                    </Card>
-                                )}
-                                {Array.from(peerStreams.entries()).map(
-                                    ([key, value]) => {
-                                        return (
-                                            <Card
-                                                className="cursor-pointer"
-                                                key={key}
-                                                onClick={() =>
-                                                    handleFullScreenVideo(
-                                                        value.stream,
-                                                        value.username,
-                                                        key
-                                                    )
-                                                }
-                                            >
-                                                <CardHeader>
-                                                    <CardTitle className="truncate">
-                                                        {value.username}'s
-                                                        Screen
-                                                    </CardTitle>
-                                                </CardHeader>
-                                                <CardContent className="px-3">
-                                                    <VideoPlayer
-                                                        stream={value.stream}
-                                                    />
-                                                </CardContent>
-                                            </Card>
-                                        );
+                    {myStream || peers.size ? (
+                        <div className="screen-grid">
+                            {myStream && (
+                                <div className="shared-screen">
+                                    <VideoPlayer stream={myStream} muted />
+                                    <span>
+                                        Your screen <small>Sharing now</small>
+                                    </span>
+                                </div>
+                            )}
+                            {Array.from(peers.entries()).map(([key, value]) => (
+                                <button
+                                    className="shared-screen"
+                                    key={key}
+                                    onClick={() =>
+                                        setExpanded({
+                                            stream: value.stream,
+                                            username: value.username,
+                                            key,
+                                        })
                                     }
-                                )}
-                            </>
-                        ) : (
-                            <div>
-                                <h1 className="font-semibold text-lg">
-                                    No screen is being streamed {">_<"}
-                                </h1>
-                                <h1 className="font-semibold text-sm mt-2">
-                                    Start streaming your screen now, by clicking
-                                    below button 👇🏻
-                                </h1>
-                            </div>
-                        )}
-                    </div>
-                    <DialogFooter className="sm:justify-center">
-                        {myStream ? (
-                            <Button
-                                className="cursor-pointer"
-                                onClick={handleStopScreenSharing}
-                            >
-                                Stop Screen Sharing
-                                <ScreenShareOff />
-                            </Button>
-                        ) : (
-                            <Button
-                                className="cursor-pointer"
-                                onClick={startScreenSharing}
-                            >
-                                Share Your Screen
-                                <ScreenShareIcon />
-                            </Button>
-                        )}
+                                    aria-label={`Expand ${value.username ?? "guest"}’s screen`}
+                                >
+                                    <VideoPlayer stream={value.stream} />
+                                    <span>
+                                        {value.username ?? "Guest"}’s screen{" "}
+                                        <Expand size={15} />
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="screens-empty">
+                            <MonitorUp size={45} strokeWidth={1.3} />
+                            <h3>A blank canvas, for now.</h3>
+                            <p>
+                                Show what you’re working on.
+                                <br />A window, a tab, or your whole screen.
+                            </p>
+                        </div>
+                    )}
+                    <DialogFooter>
+                        <button
+                            className={`room-primary-button ${myStream ? "stop-sharing" : ""}`}
+                            onClick={
+                                myStream
+                                    ? () => {
+                                          store.dispatch(stopScreenSharing());
+                                          toast("Screen sharing stopped.");
+                                      }
+                                    : startSharing
+                            }
+                            disabled={starting}
+                        >
+                            {starting ? (
+                                <LoaderCircle
+                                    size={17}
+                                    className="animate-spin"
+                                />
+                            ) : myStream ? (
+                                <ScreenShareOff size={17} />
+                            ) : (
+                                <ShareIcon size={17} />
+                            )}
+                            {starting
+                                ? "Starting…"
+                                : myStream
+                                  ? "Stop sharing"
+                                  : "Share your screen"}
+                        </button>
                     </DialogFooter>
+                    <p className="dialog-note">
+                        Your choice. You can stop sharing at any time.
+                    </p>
                 </DialogContent>
             </Dialog>
-            <Toaster position="bottom-left" closeButton />
+            {expanded && (
+                <FullScreenPlayer
+                    username={expanded.username ?? "Guest"}
+                    stream={expanded.stream}
+                    setIsFullScreen={(open) => {
+                        if (!open) setExpanded(undefined);
+                    }}
+                />
+            )}
         </>
     );
-};
-
-export default ScreenShare;
+}
